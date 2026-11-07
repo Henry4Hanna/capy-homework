@@ -133,7 +133,10 @@ const sv=(k,v)=>{try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}};
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
 const norm=s=>({data:(s&&s.data)||{},anns:(s&&s.anns)||[],pin:(s&&s.pin)||null});
-let S=norm(ld("hwS",null)),cfg=ld("hwGH",null),sha=null,q=Promise.resolve();
+/* === OPTIONAL: put sync settings here so every device connects automatically === */
+const GH_REPO="henry4hanna/homework-data";   // e.g. "yourname/homework-data"
+const GH_TOKEN="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";  // fine-grained token: Contents Read and write, data repo only
+let S=norm(ld("hwS",null)),cfg=ld("hwGH",null)||(GH_REPO&&GH_TOKEN?{repo:GH_REPO,token:GH_TOKEN}:null),sha=null,q=Promise.resolve();
 let parent=false,cur="Henry",date=iso(new Date()),pinMode="unlock";
 function iso(d){return new Date(d-d.getTimezoneOffset()*6e4).toISOString().slice(0,10)}
 function shift(n,b){const d=new Date((b||date)+"T12:00");d.setDate(d.getDate()+n);return iso(d)}
@@ -247,7 +250,7 @@ $("pok").onclick=async()=>{const v=$("pin").value.trim();
 $("pin").onkeydown=e=>{if(e.key=="Enter")$("pok").click()};
 
 /* ---------- sync settings ---------- */
-$("sync").onclick=()=>{$("grepo").value=cfg?cfg.repo:"";$("gtok").value="";$("gerr").textContent="";$("syncm").classList.add("show")};
+$("sync").onclick=()=>{$("grepo").value=cfg?cfg.repo:GH_REPO;$("gtok").value="";$("gerr").textContent="";$("syncm").classList.add("show")};
 $("gcancel").onclick=()=>$("syncm").classList.remove("show");
 $("gdis").onclick=()=>{cfg=null;try{localStorage.removeItem("hwGH")}catch(e){}$("syncm").classList.remove("show");refresh()};
 $("gsave").onclick=async()=>{const repo=$("grepo").value.trim().replace(/^https?:\/\/github\.com\//,"").replace(/\/$/,""),tok=$("gtok").value.trim()||(cfg&&cfg.token);
